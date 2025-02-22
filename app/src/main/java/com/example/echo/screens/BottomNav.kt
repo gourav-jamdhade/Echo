@@ -37,7 +37,7 @@ fun BottomNav(navController: NavHostController) {
             }
 
             composable(route = Routes.AddThreads.routes) {
-                AddThreads()
+                AddThreads(navController)
             }
 
             composable(route = Routes.Notification.routes) {
