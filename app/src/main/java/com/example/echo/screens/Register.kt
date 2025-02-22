@@ -41,9 +41,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -56,18 +53,12 @@ import androidx.navigation.NavHostController
 import coil3.compose.rememberAsyncImagePainter
 import com.example.echo.R
 import com.example.echo.navigation.Routes
+import com.example.echo.utils.Utils
 import com.example.echo.viewmodels.AuthViewModel
 
 
 @Composable
 fun Register(navController: NavHostController) {
-
-
-    val fontFamily = FontFamily(
-        Font(R.font.poppins, FontWeight.Normal, FontStyle.Normal),
-        Font(R.font.poppins_bold, FontWeight.Bold, FontStyle.Normal),
-        Font(R.font.poppins_medium, FontWeight.Medium, FontStyle.Normal)
-    )
 
 
     var email by remember {
@@ -148,7 +139,7 @@ fun Register(navController: NavHostController) {
                 fontSize = 44.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                fontFamily = fontFamily
+                fontFamily = Utils().getFontFamily()
             ), modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 32.dp)
@@ -195,7 +186,7 @@ fun Register(navController: NavHostController) {
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                fontFamily = fontFamily,
+                fontFamily = Utils().getFontFamily(),
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text
@@ -222,7 +213,7 @@ fun Register(navController: NavHostController) {
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                fontFamily = fontFamily,
+                fontFamily = Utils().getFontFamily(),
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email
@@ -250,7 +241,7 @@ fun Register(navController: NavHostController) {
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                fontFamily = fontFamily,
+                fontFamily = Utils().getFontFamily(),
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text
@@ -279,7 +270,7 @@ fun Register(navController: NavHostController) {
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                fontFamily = fontFamily,
+                fontFamily = Utils().getFontFamily(),
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password
@@ -305,7 +296,7 @@ fun Register(navController: NavHostController) {
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                fontFamily = fontFamily,
+                fontFamily = Utils().getFontFamily(),
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text
@@ -343,7 +334,7 @@ fun Register(navController: NavHostController) {
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    fontFamily = fontFamily
+                    fontFamily = Utils().getFontFamily()
                 )
             )
 
@@ -368,7 +359,7 @@ fun Register(navController: NavHostController) {
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Light,
                     textAlign = TextAlign.Center,
-                    fontFamily = fontFamily
+                    fontFamily = Utils().getFontFamily()
                 )
             )
         }
