@@ -10,7 +10,7 @@ object SharedPrefs {
         email: String,
         userName: String,
         bio: String,
-        imageUrl: String,
+        imageUrl: String?,
         context: Context
     ) {
 
