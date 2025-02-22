@@ -79,6 +79,11 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.kt.coil.compose)
+
+    implementation ("com.github.bumptech.glide:compose:1.0.0-beta01")
+
 
 
 }
