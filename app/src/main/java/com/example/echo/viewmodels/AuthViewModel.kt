@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,7 +22,6 @@ import com.parse.SaveCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class AuthViewModel : ViewModel() {
 
@@ -31,11 +29,11 @@ class AuthViewModel : ViewModel() {
     private val db = FirebaseDatabase.getInstance()
     private val userRef = db.getReference("users")
 
-    private val _firebaseUser = MutableLiveData<FirebaseUser>()
-    val firebaseUser: LiveData<FirebaseUser> = _firebaseUser
+    private val _firebaseUser = MutableLiveData<FirebaseUser?>()
+    val firebaseUser: LiveData<FirebaseUser?> = _firebaseUser
 
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> = _error
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> = _error
 
     init {
         _firebaseUser.value = auth.currentUser
@@ -163,10 +161,14 @@ class AuthViewModel : ViewModel() {
 
     }
 
-    @SuppressLint("NullSafeMutableLiveData")
+
     fun logout() {
         auth.signOut()
         _firebaseUser.postValue(null)
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 
 

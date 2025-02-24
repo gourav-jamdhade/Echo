@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -135,7 +136,9 @@ fun Register(navController: NavHostController) {
 
         Text(
             text = "Register", style = TextStyle(
-                color = Color(0xFF095aa3),
+                color = colorResource(
+                        R.color.main_color
+                    ),
                 fontSize = 44.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -194,7 +197,11 @@ fun Register(navController: NavHostController) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF095aa3), unfocusedBorderColor = Color(0xFF095aa3)
+                focusedBorderColor = colorResource(
+                        R.color.main_color
+                    ), unfocusedBorderColor = colorResource(
+                        R.color.main_color
+                    )
             )
 
         )
@@ -221,7 +228,11 @@ fun Register(navController: NavHostController) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF095aa3), unfocusedBorderColor = Color(0xFF095aa3)
+                focusedBorderColor = colorResource(
+                        R.color.main_color
+                    ), unfocusedBorderColor = colorResource(
+                        R.color.main_color
+                    )
             )
 
         )
@@ -249,7 +260,11 @@ fun Register(navController: NavHostController) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF095aa3), unfocusedBorderColor = Color(0xFF095aa3)
+                focusedBorderColor = colorResource(
+                        R.color.main_color
+                    ), unfocusedBorderColor = colorResource(
+                        R.color.main_color
+                    )
             )
 
         )
@@ -278,7 +293,11 @@ fun Register(navController: NavHostController) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF095aa3), unfocusedBorderColor = Color(0xFF095aa3)
+                focusedBorderColor = colorResource(
+                        R.color.main_color
+                    ), unfocusedBorderColor = colorResource(
+                        R.color.main_color
+                    )
             )
 
         )
@@ -304,7 +323,11 @@ fun Register(navController: NavHostController) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF095aa3), unfocusedBorderColor = Color(0xFF095aa3)
+                focusedBorderColor = colorResource(
+                        R.color.main_color
+                    ), unfocusedBorderColor = colorResource(
+                        R.color.main_color
+                    )
             )
 
         )
@@ -323,7 +346,9 @@ fun Register(navController: NavHostController) {
                 }
 
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF095aa3)),
+            colors = ButtonDefaults.buttonColors(containerColor = colorResource(
+                        R.color.main_color
+                    )),
             modifier = Modifier.fillMaxWidth(),
             shape = ShapeDefaults.Medium,
             elevation = ButtonDefaults.buttonElevation(20.dp)

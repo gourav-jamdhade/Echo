@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.echo.model.ThreadModel
-import com.example.echo.utils.SharedPrefs
 import com.google.firebase.database.FirebaseDatabase
 import com.parse.ParseACL
 import com.parse.ParseFile
@@ -23,30 +22,39 @@ class AddThreadViewModel : ViewModel() {
     private val db = FirebaseDatabase.getInstance()
     private val userRef = db.getReference("Threads")
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
 
     private val _isPosted = MutableLiveData<Boolean?>()
     val isPosted: LiveData<Boolean?> = _isPosted
 
 
     fun saveThreadData(
-        userId: String?,
+        userId: String,
         thread: String,
         imageUrl: String?,
 
 
-
         ) {
 
+        _isLoading.postValue(true) // Start loading
         val threadData =
-            ThreadModel(userId, thread, imageUrl, System.currentTimeMillis().toString())
+            ThreadModel(
+                userId = userId,
+                thread = thread,
+                imageUrl = imageUrl,
+                timestamp = System.currentTimeMillis().toString()
+            )
 
-        userRef.child(userRef.push().key!!).setValue(threadData)
-            .addOnSuccessListener {
-                _isPosted.postValue(true)
+        userRef.child(userRef.push().key!!).setValue(threadData).addOnSuccessListener {
+            _isPosted.postValue(true)
+            _isLoading.postValue(false)
 
-            }.addOnFailureListener {
-                _isPosted.postValue(false)
-            }
+        }.addOnFailureListener {
+            _isPosted.postValue(false)
+            _isLoading.postValue(false)
+        }
     }
 
     fun saveImageToBack4App(context: Context, imageUri: Uri, onSuccess: (String) -> Unit) {
@@ -73,18 +81,25 @@ class AddThreadViewModel : ViewModel() {
 
                             fileObject.saveInBackground()
                             onSuccess(parseFile.url)
+                            // _isLoading.postValue(true)
                             Log.d("Upload", "File uploaded successfully: ${parseFile.url}")
                         } else {
+                            _isLoading.postValue(false) // Stop loading if upload fails
                             Log.d("error", e.message.toString())
                         }
                     })
                 }
 
             } catch (e: Exception) {
-
+                _isLoading.postValue(false) // Stop loading on exception
+                Log.e("saveImageToBack4App", "Error uploading image", e)
             }
         }
 
+    }
+
+    fun setLoading(loading: Boolean) {
+        _isLoading.value = loading
     }
 
 

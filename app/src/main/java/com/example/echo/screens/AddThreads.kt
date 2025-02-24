@@ -1,15 +1,13 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.example.echo.screens
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,6 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -58,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -88,6 +88,8 @@ fun AddThreads(navController: NavHostController) {
 
     val threadViewModel: AddThreadViewModel = viewModel()
     val isPosted by threadViewModel.isPosted.observeAsState()
+    val isLoading by threadViewModel.isLoading.observeAsState(false)
+
     var thread by remember { mutableStateOf("") }
     val context = LocalContext.current
     //for Attachments
@@ -128,9 +130,10 @@ fun AddThreads(navController: NavHostController) {
         if (isPosted == true) {
             thread = ""
             imageUri = null
+            threadViewModel.setLoading(false)
             Toast.makeText(context, "Echo post added successfully", Toast.LENGTH_SHORT).show()
             navController.navigate(Routes.Home.routes) {
-                popUpTo(Routes.AddThreads.routes) {
+                popUpTo(0) {
                     inclusive = true
                 }
                 launchSingleTop = true
@@ -181,20 +184,29 @@ fun AddThreads(navController: NavHostController) {
 //        val response = URL("https://picsum.photos/200").readText()
 //        Log.d("NetworkTest", "Connected: $response")
 
-        GlideImage(
-            model = SharedPrefs.getImageUrl(context).ifEmpty {
-                painterResource(R.drawable.no_image)
-            },
-            contentDescription = "profilePic",
-            modifier = Modifier
-                .constrainAs(profilePic) {
-                    top.linkTo(addThreadText.bottom, margin = 24.dp)
-                    start.linkTo(parent.start)
+        GlideImage(model = SharedPrefs.getImageUrl(context).ifEmpty {
+            painterResource(R.drawable.no_image)
+        }, contentDescription = "profilePic", modifier = Modifier
+            .constrainAs(profilePic) {
+                top.linkTo(addThreadText.bottom, margin = 24.dp)
+                start.linkTo(parent.start)
+            }
+            .size(32.dp)
+            .clip(CircleShape)
+            .clickable {
+                Log.d(
+                    "NavController",
+                    "Current destination: ${navController.currentDestination?.route}"
+                )
+
+                navController.navigate(Routes.Profile.routes) {
+                    popUpTo(Routes.AddThreads.routes) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+
                 }
-                .size(32.dp)
-                .clip(CircleShape)
-                .clickable {},
-            contentScale = ContentScale.Crop,
+            }, contentScale = ContentScale.Crop
         )
 
         Text(text = SharedPrefs.getName(context), style = TextStyle(
@@ -253,7 +265,9 @@ fun AddThreads(navController: NavHostController) {
                 }
             }
             Box(modifier = Modifier
-                .background(Color.Gray.copy(alpha = .4f), shape = RoundedCornerShape(10.dp))
+                .background(
+                    Color.Gray.copy(alpha = .4f), shape = RoundedCornerShape(10.dp)
+                )
                 .padding(12.dp)
                 .constrainAs(imageBox) {
                     top.linkTo(editText.bottom, margin = 24.dp)
@@ -261,11 +275,9 @@ fun AddThreads(navController: NavHostController) {
                     end.linkTo(parent.end)
 
                 }
-                .height(200.dp)
-            ) {
+                .height(200.dp)) {
                 Image(
-                    painter =
-                    rememberAsyncImagePainter(model = imageUri),
+                    painter = rememberAsyncImagePainter(model = imageUri),
                     contentDescription = "profilePic",
                     modifier = Modifier
 //                        .fillMaxWidth()
@@ -276,16 +288,14 @@ fun AddThreads(navController: NavHostController) {
                     contentScale = ContentScale.Crop
                 )
 
-                Icon(
-                    imageVector = Icons.Default.Clear,
+                Icon(imageVector = Icons.Default.Clear,
                     contentDescription = "remove the attachment",
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .offset(x = 20.dp, y = (-20).dp)
                         .clickable {
                             imageUri = null
-                        }
-                )
+                        })
 
             }
         }
@@ -298,8 +308,7 @@ fun AddThreads(navController: NavHostController) {
             start.linkTo(parent.start)
         }) {
             Text(
-                text = selectedOption,
-                style = TextStyle(
+                text = selectedOption, style = TextStyle(
                     color = Color.Black,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
@@ -320,45 +329,65 @@ fun AddThreads(navController: NavHostController) {
         }
 
 
+        var alreadyClicked by remember { mutableStateOf(false) }
+
+
 
 
         TextButton(onClick = {
 
-            if (thread.isEmpty() && imageUri == null) {
-                Toast.makeText(context, "Can not post an empty post", Toast.LENGTH_SHORT).show()
-            } else if (imageUri == null) {
-                threadViewModel.saveThreadData(
-                    thread = thread,
-                    userId=FirebaseAuth.getInstance().currentUser!!.uid,
-                    imageUrl = ""
-                )
-            } else {
+            if (!alreadyClicked) {
 
-                threadViewModel.saveImageToBack4App(context, imageUri!!) { imageUrl ->
 
-                    threadViewModel.saveThreadData(
-                        thread,
-                        FirebaseAuth.getInstance().currentUser!!.uid,
-                        imageUrl
-                    )
+                if (thread.isEmpty() && imageUri == null) {
+                    Toast.makeText(context, "Can not post an empty post", Toast.LENGTH_SHORT).show()
+                } else {
+                    if (imageUri == null) {
+                        threadViewModel.saveThreadData(
+                            thread = thread,
+                            userId = FirebaseAuth.getInstance().currentUser!!.uid,
+                            imageUrl = ""
+                        )
+                    } else {
+
+                        threadViewModel.saveImageToBack4App(context, imageUri!!) { imageUrl ->
+
+                            threadViewModel.saveThreadData(
+                                thread = thread,
+                                userId = FirebaseAuth.getInstance().currentUser!!.uid,
+                                imageUrl = imageUrl
+                            )
+                        }
+                    }
                 }
             }
-        }, modifier = Modifier
+
+
+        }, enabled = !isLoading, modifier = Modifier
             .constrainAs(button) {
                 bottom.linkTo(parent.bottom)
                 end.linkTo(parent.end)
             }
-            .background(Color(0xFF095aa3), shape = RoundedCornerShape(10))) {
-            Text(
-                text = "POST",
-                style = TextStyle(
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Center,
-                    fontFamily = Utils().getFontFamily()
+            .background(
+                colorResource(
+                    R.color.main_color
+                ), shape = RoundedCornerShape(10)
+            )) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = Color.White, modifier = Modifier.size(24.dp)
                 )
-            )
+            } else {
+                Text(
+                    text = "POST", style = TextStyle(
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        fontFamily = Utils().getFontFamily()
+                    )
+                )
+            }
 
 
         }
@@ -384,49 +413,40 @@ fun AddThreads(navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReplyPrivacyBottomSheet(
-    sheetState: SheetState,
-    onDismiss: () -> Unit,
-    onOptionSelected: (String) -> Unit
+    sheetState: SheetState, onDismiss: () -> Unit, onOptionSelected: (String) -> Unit
 ) {
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState
+        onDismissRequest = onDismiss, sheetState = sheetState
     ) {
         Column {
             Text(
-                text = "Who can reply?",
-                style = TextStyle(
+                text = "Who can reply?", style = TextStyle(
                     color = Color.Black,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     fontFamily = Utils().getFontFamily()
-                ),
-                modifier = Modifier.padding(bottom = 12.dp, start = 12.dp)
+                ), modifier = Modifier.padding(bottom = 12.dp, start = 12.dp)
             )
 
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
             //Option 1: Anyone Can Reply
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onOptionSelected("Anyone Can Reply")
-                    }
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onOptionSelected("Anyone Can Reply")
+                }
+                .padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painterResource(R.drawable.baseline_groups_24),
                     contentDescription = "groups"
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Anyone Can Reply",
-                    style = TextStyle(
+                    text = "Anyone Can Reply", style = TextStyle(
                         color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
@@ -438,23 +458,18 @@ fun ReplyPrivacyBottomSheet(
             }
 
             //Option 2: Only Followers Can Reply
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onOptionSelected("Only Followers Can Reply")
-                    }
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    onOptionSelected("Only Followers Can Reply")
+                }
+                .padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "groups"
+                    imageVector = Icons.Default.Person, contentDescription = "groups"
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Only Followers Can Reply ",
-                    style = TextStyle(
+                    text = "Only Followers Can Reply ", style = TextStyle(
                         color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
@@ -519,28 +534,31 @@ fun BasicTextFieldWithHint(
 
 
             BasicTextField(
-                value = value, onValueChange = {
-                    if (it.length <= 500) {
+                value = value,
+                onValueChange = {
+                    if (it.length <= 1000) {
                         onValueChange(it)
                         coroutineScope.launch {
                             scrollState.scrollTo(scrollState.maxValue)
                         }
                     }
 
-                }, textStyle = TextStyle(
+                },
+                textStyle = TextStyle(
                     color = Color.Black,
                     fontSize = 14.sp,
                     fontFamily = Utils().getFontFamily(),
                     fontWeight = FontWeight.Light
-                ), modifier = Modifier
+                ),
+                modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 150.dp)
+                    .heightIn(max = 250.dp)
                     .verticalScroll(scrollState)
 
             )
 
             Text(
-                text = "${value.length}/500",
+                text = "${value.length}/1000",
                 fontSize = 12.sp,
                 color = Color.Gray,
                 modifier = Modifier.align(Alignment.End)

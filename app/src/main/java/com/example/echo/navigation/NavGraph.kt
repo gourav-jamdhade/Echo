@@ -1,7 +1,6 @@
 package com.example.echo.navigation
 
 import androidx.compose.runtime.Composable
-
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,7 +32,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(Routes.Home.routes) {
-            Home()
+            Home(navController)
         }
 
         composable(Routes.Profile.routes) {
@@ -41,12 +40,14 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(Routes.Search.routes) {
-            Search()
+            Search(navController)
         }
 
+        // Wrap screens with BottomNav here
         composable(Routes.BottomNav.routes) {
             BottomNav(navController)
         }
+
 
         composable(Routes.Login.routes) {
             Login(navController)

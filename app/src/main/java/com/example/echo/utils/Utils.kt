@@ -12,7 +12,8 @@ class Utils{
         Font(R.font.poppins, FontWeight.Normal, FontStyle.Normal),
         Font(R.font.poppins_bold, FontWeight.Bold, FontStyle.Normal),
         Font(R.font.poppins_medium, FontWeight.Medium, FontStyle.Normal),
-        Font(R.font.poppins_light, FontWeight.Light, FontStyle.Normal)
+        Font(R.font.poppins_light, FontWeight.Light, FontStyle.Normal),
+        Font(R.font.poppins_italic, FontWeight.Normal, FontStyle.Italic)
     )
 
 

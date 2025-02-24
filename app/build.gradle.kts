@@ -83,6 +83,8 @@ dependencies {
     implementation(libs.coil.kt.coil.compose)
 
     implementation ("com.github.bumptech.glide:compose:1.0.0-beta01")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
+
 
 
 

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -78,9 +79,13 @@ fun Login(navController: NavHostController) {
 
     val context = LocalContext.current
 
-    error?.let {
-        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+    LaunchedEffect(error) {
+        error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            authViewModel.clearError()
+        }
     }
+
 
 
 
@@ -97,7 +102,9 @@ fun Login(navController: NavHostController) {
 
         Text(
             text = "Login", style = TextStyle(
-                color = Color(0xFF095aa3),
+                color = colorResource(
+                    R.color.main_color
+                ),
                 fontSize = 44.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -106,6 +113,7 @@ fun Login(navController: NavHostController) {
                 .fillMaxWidth()
                 .padding(bottom = 32.dp)
         )
+
 
         OutlinedTextField(
             value = email,
@@ -133,7 +141,6 @@ fun Login(navController: NavHostController) {
         )
 
 
-
         Spacer(modifier = Modifier.padding(16.dp))
 
         OutlinedTextField(
@@ -156,7 +163,11 @@ fun Login(navController: NavHostController) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF095aa3), unfocusedBorderColor = Color(0xFF095aa3)
+                focusedBorderColor = colorResource(
+                    R.color.main_color
+                ), unfocusedBorderColor = colorResource(
+                    R.color.main_color
+                )
             )
 
         )
@@ -168,7 +179,11 @@ fun Login(navController: NavHostController) {
 
                 authViewModel.login(email = email, password = password, context = context)
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF095aa3)),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(
+                    R.color.main_color
+                )
+            ),
             modifier = Modifier.fillMaxWidth(),
             shape = ShapeDefaults.Medium,
             elevation = ButtonDefaults.buttonElevation(20.dp)
